@@ -30,7 +30,7 @@
       text-align: center;
       margin-bottom: 30px;
       font-size: 2.2rem;
-      color: white;
+      color: rgb(137, 189, 154);
     }
 
     .container {
@@ -121,6 +121,17 @@
       font-size: 18px;
     }
 
+    .system-info p {
+    font-size: 16px;       
+    font-weight: bold; 
+    color: #e2b316;          
+    margin: 5px 0;           
+    }
+
+    .system-info img {
+    margin-left: 8px;
+    }
+
     body.dark .bg-circle {
       stroke: #2e2e2e;
     }
@@ -137,6 +148,13 @@
       <button onclick="toggleTheme()">Toggle Dark Mode</button>
     </div>
     <h1>System Monitor</h1>
+      <div class="system-info">
+      <p id="osType">OS: <img id="osIcon" alt="OS Icon" style="height: 24px; vertical-align: middle;"></p>
+ </p>
+      <p id="osVersion">Version: </p>
+      <p id="architecture">Architecture: </p>
+      <br>
+      </div></p>
     <div class="meters">
       <div class="meter">
         <div id="cpuGlow" class="glow-ring glow-green"></div>
@@ -206,16 +224,20 @@
       try {
         const res = await fetch('http://127.0.0.1:8000/status');
         const data = await res.json();
+        document.getElementById("osType").textContent = "OS: " + data.os_type;
+        document.getElementById("osVersion").textContent = "Version: " + data.os_version;
+        document.getElementById("architecture").textContent = "Architecture: " + data.architecture;
         updateMeter("cpuCircle", "cpuValue", data.cpu, "cpuGlow", "glow-green");
         updateMeter("memoryCircle", "memoryValue", data.memory, "memoryGlow", "glow-orange");
         updateMeter("diskCircle", "diskValue", data.disk, "diskGlow", "glow-yellow");
+        
       } catch (err) {
         console.error("Fetch failed:", err);
       }
     }
 
     fetchStatus();
-    setInterval(fetchStatus, 1);
+    setInterval(fetchStatus, 1000);
   </script>
 </body>
 </html>

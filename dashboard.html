@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>System Monitor Dashboard</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --text: #222;
+      --card: #fff;
+    }
+
+    body.dark {
+      --bg: #0e0e0e;
+      --text: #ffffff;
+      --card: #1a1a1a;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.2rem;
+      color: white;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .toggle {
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 25px;
+      background-color: #333;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .meters {
+      display: flex;
+      gap: 50px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .meter {
+      position: relative;
+      width: 170px;
+      height: 170px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .meter:hover {
+      transform: scale(1.07);
+    }
+
+    .glow-ring {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      right: 5px;
+      bottom: 5px;
+      border-radius: 50%;
+      z-index: 0;
+      filter: blur(20px);
+      opacity: 0.6;
+    }
+
+    .meter svg {
+      position: relative;
+      z-index: 2;
+      transform: rotate(-90deg);
+    }
+
+    .meter circle {
+      fill: none;
+      stroke-width: 12;
+      stroke-linecap: round;
+    }
+
+    .bg-circle {
+      stroke: #444;
+    }
+
+    .progress-circle {
+      transition: stroke 0.3s;
+    }
+
+    .meter-value {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      z-index: 3;
+      transform: translate(-50%, -50%);
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .label {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 18px;
+    }
+
+    body.dark .bg-circle {
+      stroke: #2e2e2e;
+    }
+
+    /* Glow colors */
+    .glow-green { background: radial-gradient(circle, #00e67688, transparent); }
+    .glow-orange { background: radial-gradient(circle, #ff980088, transparent); }
+    .glow-yellow { background: radial-gradient(circle, #ffeb3b88, transparent); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="toggle">
+      <button onclick="toggleTheme()">Toggle Dark Mode</button>
+    </div>
+    <h1>System Monitor</h1>
+    <div class="meters">
+      <div class="meter">
+        <div id="cpuGlow" class="glow-ring glow-green"></div>
+        <svg width="170" height="170">
+          <circle class="bg-circle" cx="85" cy="85" r="70"/>
+          <circle id="cpuCircle" class="progress-circle" cx="85" cy="85" r="70" stroke-dasharray="439" stroke-dashoffset="439"/>
+        </svg>
+        <div id="cpuValue" class="meter-value">0%</div>
+        <div class="label">CPU</div>
+      </div>
+      <div class="meter">
+        <div id="memoryGlow" class="glow-ring glow-orange"></div>
+        <svg width="170" height="170">
+          <circle class="bg-circle" cx="85" cy="85" r="70"/>
+          <circle id="memoryCircle" class="progress-circle" cx="85" cy="85" r="70" stroke-dasharray="439" stroke-dashoffset="439"/>
+        </svg>
+        <div id="memoryValue" class="meter-value">0%</div>
+        <div class="label">Memory</div>
+      </div>
+      <div class="meter">
+        <div id="diskGlow" class="glow-ring glow-yellow"></div>
+        <svg width="170" height="170">
+          <circle class="bg-circle" cx="85" cy="85" r="70"/>
+          <circle id="diskCircle" class="progress-circle" cx="85" cy="85" r="70" stroke-dasharray="439" stroke-dashoffset="439"/>
+        </svg>
+        <div id="diskValue" class="meter-value">0%</div>
+        <div class="label">Disk</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+    }
+
+    function getColor(value) {
+      if (value <= 20) return "#00e676";      // Green
+      if (value <= 40) return "#cddc39";      // Lime
+      if (value <= 60) return "#ffeb3b";      // Yellow
+      if (value <= 80) return "#ff9800";      // Orange
+      return "#f44336";                       // Red
+    }
+
+    function getGlowClass(value, type) {
+      if (value <= 40) return `glow-${type}`;
+      if (value <= 80) return `glow-${type}`;
+      return `glow-${type}`;
+    }
+
+    function updateMeter(circleId, valueId, value, glowId, glowBase) {
+      const circle = document.getElementById(circleId);
+      const label = document.getElementById(valueId);
+      const glow = document.getElementById(glowId);
+      const radius = 70;
+      const circumference = 2 * Math.PI * radius;
+      const offset = circumference - (value / 100) * circumference;
+
+      circle.style.strokeDashoffset = offset;
+      circle.setAttribute("stroke", getColor(value));
+      label.textContent = value + "%";
+
+      glow.className = `glow-ring ${glowBase}`;
+    }
+
+    async function fetchStatus() {
+      try {
+        const res = await fetch('http://127.0.0.1:8000/status');
+        const data = await res.json();
+        updateMeter("cpuCircle", "cpuValue", data.cpu, "cpuGlow", "glow-green");
+        updateMeter("memoryCircle", "memoryValue", data.memory, "memoryGlow", "glow-orange");
+        updateMeter("diskCircle", "diskValue", data.disk, "diskGlow", "glow-yellow");
+      } catch (err) {
+        console.error("Fetch failed:", err);
+      }
+    }
+
+    fetchStatus();
+    setInterval(fetchStatus, 2000);
+  </script>
+</body>
+</html>

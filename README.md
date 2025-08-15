@@ -1,4 +1,4 @@
-# 🚀 Server Health Monitoring Dashboard
+# 🚀 Server Health Monitoring Dashboard VS CODE
 
 A **FastAPI-based application** that monitors CPU, Memory, and Disk usage and displays them in a real-time dashboard using HTML, CSS, and JavaScript.
 

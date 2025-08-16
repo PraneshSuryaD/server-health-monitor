@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import psutil
 import platform
-
+import cpuinfo
 
 app = FastAPI()
 
@@ -22,4 +22,6 @@ def get_status():
     cpu = psutil.cpu_percent(interval=1)
     memory = psutil.virtual_memory().percent
     disk = psutil.disk_usage('/').percent
-    return {"cpu": cpu, "memory": memory, "disk": disk,"os_type": osi_type, "os_version": osi_version, "architecture":architecture}
+    cpu_info = cpuinfo.get_cpu_info()
+    processor = cpu_info.get("brand_raw", platform.processor())
+    return {"cpu": cpu, "memory": memory, "disk": disk,"os_type": osi_type, "os_version": osi_version, "architecture":architecture , "processor": processor}

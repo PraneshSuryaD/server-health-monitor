@@ -149,9 +149,10 @@
     </div>
     <h1>System Monitor</h1>
       <div class="system-info">
-      <p id="osType">OS: <img id="osIcon" alt="OS Icon" style="height: 24px; vertical-align: middle;"></p>
- </p>
+      <p>OS: <span id="osType"></span>
+      <img id="osIcon" alt="OS Icon" style="height: 24px; vertical-align: middle; margin-left: 6px;"></p>
       <p id="osVersion">Version: </p>
+      <p id="processor">Processor: </p>
       <p id="architecture">Architecture: </p>
       <br>
       </div></p>
@@ -224,9 +225,27 @@
       try {
         const res = await fetch('http://127.0.0.1:8000/status');
         const data = await res.json();
-        document.getElementById("osType").textContent = "OS: " + data.os_type;
+        document.getElementById("osType").textContent = data.os_type;
         document.getElementById("osVersion").textContent = "Version: " + data.os_version;
         document.getElementById("architecture").textContent = "Architecture: " + data.architecture;
+        document.getElementById("processor").textContent = "Processor: "+ data.processor;
+        const osIcon = document.getElementById("osIcon");
+        switch (data.os_type.toLowerCase()) {
+        case "windows":
+          osIcon.src = "https://img.icons8.com/color/48/windows-10.png";
+          break;
+        case "linux":
+          osIcon.src = "https://img.icons8.com/color/48/linux.png";
+          break;
+        case "darwin": 
+          osIcon.src = "https://img.icons8.com/color/48/mac-os.png";
+          break;
+        case "chromeos":
+          osIcon.src = "https://img.icons8.com/color/48/chrome-os.png";
+          break;
+        default:
+          osIcon.src = "";
+        }
         updateMeter("cpuCircle", "cpuValue", data.cpu, "cpuGlow", "glow-green");
         updateMeter("memoryCircle", "memoryValue", data.memory, "memoryGlow", "glow-orange");
         updateMeter("diskCircle", "diskValue", data.disk, "diskGlow", "glow-yellow");
